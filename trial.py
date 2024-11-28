@@ -1,19 +1,25 @@
 import streamlit as st
-import whisper
-import tempfile
+import speech_recognition as sr
 
-# Load the Whisper model
-model = whisper.load_model("small", device="cpu")
+# Initialize recognizer
+recognizer = sr.Recognizer()
 
+# Streamlit file uploader for audio file input
 audio_file = st.audio_input("Record")
 
-if audio_file:
-    with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
-        tmp_file.write(audio_file.getvalue())  # Save uploaded file content
-        tmp_file_path = tmp_file.name  # Path to temporary file
-    
-    # Transcribe using Whisper
-    result = model.transcribe(tmp_file_path)
-    
-    st.write("Transcription:")
-    st.text(result["text"])
+if audio_file is not None:
+    # Save uploaded audio file
+    with open("temp_audio.wav", "wb") as f:
+        f.write(audio_file.getbuffer())
+
+    # Recognize speech from audio file
+    with sr.AudioFile("temp_audio.wav") as source:
+        audio_data = recognizer.record(source)
+        try:
+            # Use Google Web Speech API to convert speech to text
+            text = recognizer.recognize_google(audio_data)
+            st.write("Transcription: ", text)
+        except sr.UnknownValueError:
+            st.error("Could not understand the audio.")
+        except sr.RequestError:
+            st.error("Could not request results from Google Speech Recognition service.")
