@@ -3,7 +3,7 @@ import whisper
 import io
 # Load the Whisper model (small, medium, large)
 # Audio file uploader
-model = whisper.load_model("small")
+model = whisper.load_model("small",device="cpu")
 audio_data = st.audio_input("Record your audio")
 
 if audio_data:
