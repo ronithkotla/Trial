@@ -2,7 +2,7 @@ import streamlit as st
 import whisper
 
 # Load the Whisper model (small, medium, large)
-model = whisper.load_model("small")
+model = whisper.load_model("small",device="cpu")
 
 # Audio file uploader
 audio_file = st.audio_input("Record")
