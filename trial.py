@@ -1,18 +1,19 @@
 import streamlit as st
 import whisper
-import io
-# Load the Whisper model (small, medium, large)
-# Audio file uploader
-model = whisper.load_model("small",device="cpu")
-audio_data = st.audio_input("Record your audio")
+import tempfile
 
-if audio_data:
-    # Use BytesIO to simulate a file-like object from the audio byte data
-    audio_file = io.BytesIO(audio_data)
+# Load the Whisper model
+model = whisper.load_model("small", device="cpu")
 
-    # Perform speech-to-text using Whisper
-    result = model.transcribe(audio_file)
+audio_file = st.audio_input("Record")
 
-    # Display the transcribed text
+if audio_file:
+    with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+        tmp_file.write(audio_file.getvalue())  # Save uploaded file content
+        tmp_file_path = tmp_file.name  # Path to temporary file
+    
+    # Transcribe using Whisper
+    result = model.transcribe(tmp_file_path)
+    
     st.write("Transcription:")
     st.text(result["text"])
